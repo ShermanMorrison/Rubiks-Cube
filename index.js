@@ -163,24 +163,43 @@ function BigCube (dim) {
 
 BigCube.prototype.try_rotate = function() {
     // no rotation to do
-    if (this.xyz_to_rotate == null || this.layer_to_rotate == null){
+    if (this.xyz_to_rotate == null || this.layer_to_rotate == null
+        || !(this.angles[this.xyz_to_rotate]) || this.layer_to_rotate == null){
         return;
     }
 
     // physically rotate cube
     this.rotate_animate(this.xyz_to_rotate, this.layer_to_rotate, this.rate);
 
-    // last iteration of the current rotation
-    if (this.angles[this.xyz_to_rotate] <= this.rate){
-        //this.update_layers(this.xyz_to_rotate, this.layer_to_rotate this.original_angles[this.xyz_to_rotate]);
 
+
+    // cleanup if last iteration of the current rotation
+    this.process_rotation();
+
+}
+
+BigCube.prototype.process_rotation = function() {
+    var rate = this.rate;
+
+    if (this.angles[this.xyz_to_rotate] > 0){
+        this.angles[this.xyz_to_rotate] -= rate;
+    }
+    else {
+        this.angles[this.xyz_to_rotate] += rate;
+    }
+
+    this.cleanup_if_last_rotation();
+}
+
+
+BigCube.prototype.cleanup_if_last_rotation = function() {
+    if (Math.abs(this.angles[this.xyz_to_rotate]) < this.rate){
         //cleanup
         this.angles[this.xyz_to_rotate] = 0;
         this.original_angles[this.xyz_to_rotate] = 0;
         this.xyz_to_rotate = null;
         this.layer_to_rotate = null;
     }
-
 }
 
 // Physically rotate the cube
@@ -218,10 +237,11 @@ BigCube.prototype.copy_cube = function(dim){
     return cube;
 }
 
+var rad = Math.PI/ 180;
 var bigCube = new BigCube(3);
 bigCube.xyz_to_rotate = 2;
 bigCube.layer_to_rotate = 2;
-bigCube.angles[bigCube.xyz_to_rotate] = 90;
+bigCube.angles[bigCube.xyz_to_rotate] = 90 * rad;
 render();
 
 

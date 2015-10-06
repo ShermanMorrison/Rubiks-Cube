@@ -119,6 +119,8 @@ function BigCube (dim) {
     this.xyz_to_rotate = null;
     this.layer_to_rotate = null;
 
+    this.queue = new Queue();
+
     this.make_cube = function(dim){
         cube = [];
         for (var x=0; x<dim; x++){
@@ -172,7 +174,6 @@ BigCube.prototype.try_rotate = function() {
     this.rotate_animate(this.xyz_to_rotate, this.layer_to_rotate, this.rate);
 
 
-
     // cleanup if last iteration of the current rotation
     this.process_rotation();
 
@@ -194,12 +195,15 @@ BigCube.prototype.process_rotation = function() {
 
 BigCube.prototype.cleanup_if_last_rotation = function() {
     if (Math.abs(this.angles[this.xyz_to_rotate]) < this.rate){
+        this.update_cube_state(this.xyz_to_rotate, this.layer_to_rotate, this.original_angles[this.xyz_to_rotate]);
+
         //cleanup
         this.angles[this.xyz_to_rotate] = 0;
         this.original_angles[this.xyz_to_rotate] = 0;
         this.xyz_to_rotate = null;
         this.layer_to_rotate = null;
     }
+
 }
 
 // Physically rotate the cube
@@ -217,14 +221,70 @@ BigCube.prototype.rotate_animate = function(xyz, index, rate) {
 }
 
 // Update layers after completing a rotation
-BigCube.prototype.update_layers = function(xyz, index, angle) {
+BigCube.prototype.update_cube_state = function(xyz, index, angle) {
+
+    // set lower & upper lims on indices for the rotating plane
+    var lower_lims = Array.apply(null, Array(3)).map(Number.prototype.valueOf, 0);
+    var upper_lims = Array.apply(null, Array(3)).map(Number.prototype.valueOf, this.dim);
+    lower_lims[xyz] = index;
+    upper_lims[xyz] = index + 1;
+
+    // update the cube
+    this.update_cube(xyz, index, angle, lower_lims, upper_lims);
+
+    // update the layers
+    this.update_layers(xyz, index, angle);
+}
+
+
+BigCube.prototype.update_cube = function(xyz, index, angle, lower_lims, upper_lims) {
+    var cube_copy = this.copy_cube();
+
+    for (var x=lower_lims[0]; x<upper_lims[0]; x++){
+        for (var y=lower_lims[1]; y<upper_lims[1]; y++){
+            for (var z=lower_lims[2]; z<upper_lims[2]; z++){
+                if (angle > 0){
+                    switch (xyz) {
+                        case 0:
+                            this.cube[x][y][z] = cube_copy[x][z][2-y];
+                            break;
+                        case 1:
+                            this.cube[x][y][z] = cube_copy[2-z][y][x];
+                        default:
+                            throw "AHHH";
+                            break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+BigCube.prototype.queue_rotation = function(xyz, ccw) {
 
 }
 
 
+BigCube.prototype.update_layers = function(xyz, index, angle, lower_lims, upper_lims) {
+//    var dim1 = (xyz + 1) % 3;
+//    var dim2 = (xyz + 1) % 3;
+//
+//    // add and remove from the <dim> layers of dim1
+//    for (var i=0; i<this.dim; i++){
+//        for (var j=0; j<(this.dim * this.dim); j++){
+//
+//        }
+//    }
+//
+//    // add to layers
 
-BigCube.prototype.copy_cube = function(dim){
+    this.layers = this.make_layers(this.dim);
+}
+
+BigCube.prototype.copy_cube = function(){
+    var dim = this.dim;
     cube = []
+
     for (var x=0; x<dim; x++){
         cube.push([])
         for (var y=0; y<dim; y++){
@@ -239,9 +299,21 @@ BigCube.prototype.copy_cube = function(dim){
 
 var rad = Math.PI/ 180;
 var bigCube = new BigCube(3);
-bigCube.xyz_to_rotate = 2;
-bigCube.layer_to_rotate = 2;
-bigCube.angles[bigCube.xyz_to_rotate] = 90 * rad;
+
+
+function rotateX() {
+    bigCube.xyz_to_rotate = 0;
+    bigCube.layer_to_rotate = 2;
+    bigCube.original_angles[bigCube.xyz_to_rotate] = 90 * rad;
+    bigCube.angles[bigCube.xyz_to_rotate] = 90 * rad;
+}
+
+function rotateY() {
+    bigCube.xyz_to_rotate = 1;
+    bigCube.layer_to_rotate = 2;
+    bigCube.original_angles[bigCube.xyz_to_rotate] = 90 * rad;
+    bigCube.angles[bigCube.xyz_to_rotate] = 90 * rad;
+}
 render();
 
 

@@ -47,7 +47,7 @@ var render = function () {
 ** Class for individual cubes within the Rubik's Cube.
 ** Contains methods to manipulate cube and add it to scene.
 */
-function Cube (x, y, z) {
+function Cube (x, y, z, offset) {
 
     var geometry = new THREE.BoxGeometry( 1, 1, 1 );
     var material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: THREE.FaceColors} );
@@ -84,6 +84,10 @@ function Cube (x, y, z) {
     cube2.position.y = y;
     cube2.position.z = z;
     this.cube2 = cube2;
+
+    this.orig_x = x + offset;
+    this.orig_y = y + offset;
+    this.orig_z = z + offset;
 }
 
 Cube.prototype.add_to_scene = function() {
@@ -115,6 +119,9 @@ Cube.prototype.rotate = function(dim, a){
     this.cube.geometry.applyMatrix(rotation);
 }
 
+/*
+** Class for queued rotations.
+*/
 function QueuedRotation (xyz, layer, ccw) {
     this.xyz = xyz;
     this.layer = layer;
@@ -128,6 +135,9 @@ function QueuedRotation (xyz, layer, ccw) {
 ** Contains methods to rotate cube and make cube copies.
 */
 function BigCube(dim) {
+
+    this.is_checking_solved = false;
+    this.is_solved = false;
 
     this.num_scramble_turns = 20;
     this.is_scrambling = false;
@@ -150,7 +160,7 @@ function BigCube(dim) {
             for (var y=0; y<dim; y++){
                 cube[x].push([]);
                 for (var z=0; z<dim; z++){
-                    cube[x][y].push(new Cube(x - (this.dim/2 - 0.5), y - (this.dim/2 - 0.5), z - (this.dim/2 - 0.5)));
+                    cube[x][y].push(new Cube(x - (this.dim/2 - 0.5), y - (this.dim/2 - 0.5), z - (this.dim/2 - 0.5), this.dim/2 - 0.5));
                 }
             }
         }
@@ -195,6 +205,7 @@ BigCube.prototype.do_full_rotation = function() {
 
     if (this.queue.isEmpty()){
         this.is_scrambling = false;
+        this.check_if_solved();
     }
 }
 
@@ -247,6 +258,9 @@ BigCube.prototype.cleanup_if_last_rotation = function(current_rotation) {
 
         //cleanup
         this.queue.dequeue();
+
+        //check if solved and handle appropriately
+        this.check_if_solved();
 
         return true;
     }
@@ -349,6 +363,36 @@ BigCube.prototype.update_layers = function(xyz, index, ccw, lower_lims, upper_li
     this.layers = this.make_layers(this.dim);
 }
 
+BigCube.prototype.get_is_solved = function(){
+    var is_solved = true;
+    var cube = bigCube.cube;
+    var p;
+    for (var x=0; x<this.dim; x++){
+        for (var y=0; y<this.dim; y++){
+            for (var z=0; z<this.dim; z++){
+                var mini_cube = cube[x][y][z]
+                var orig_x = mini_cube.orig_x;
+                var orig_y = mini_cube.orig_y;
+                var orig_z = mini_cube.orig_z;
+                if (!(orig_x==x && orig_y==y && orig_z==z)){
+                    is_solved = false;
+                    break;
+                }
+            }
+        }
+    }
+    return is_solved;
+}
+
+BigCube.prototype.check_if_solved = function() {
+    var is_solved = this.get_is_solved();
+
+    if (is_solved){
+        alert("You solved the cube! Good job!");
+    }
+
+}
+
 BigCube.prototype.copy_cube = function(){
     var dim = this.dim;
     cube = []
@@ -372,6 +416,8 @@ function scramble(myCube) {
     var newBigCube = reset(myCube);
 
     newBigCube.is_scrambling = true;
+    newBigCube.is_checking_solved;
+
     // scramble cube
     for (var s=0; s<newBigCube.num_scramble_turns; s++) {
         var xyz = Math.floor(3 * Math.random());

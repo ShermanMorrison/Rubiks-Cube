@@ -1,8 +1,10 @@
-Implement BigCube.scramble()
+1. Implement BigCube.scramble()
 
-Implement BigCube.get_is_solved()
+2. Implement BigCube.get_is_solved()
 
-__SCRAMBLE__
+
+
+1. __SCRAMBLE__
 
 Desires
 
@@ -73,5 +75,36 @@ Implementation
         Nothing, the things getting rendered are the actual Cube objects.
         So the reset() method has to reset BigCube.cube to contain the right cubes,
         and then actually rotate the cubes to their correct position.
+
+
+
+
+2.  __CHECK IF SOLVED__
+
+    Only start checking if solved after a scramble is executed.
+
+    After each user supplied rotation, check if cube is solved.
+
+    If a reset is executed, stop checking.
+
+
+
+    Issue
+        In try_update, we determine that cube is solved before the last render has happened.
+        If we immediately alert, cube won't get to do the last render until user closes alert.
+
+        We can solve this by
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -39,11 +39,9 @@ Implementation
             This is because both are just references to the object. Setting cube_container.bigCube to null
             just sets a reference to null.
 
-            Having a cube_container allows me to change where in memory the cube_container.bigCube points.
+            The solution is to only keep one reference to the memory holding the BigCube object.
             Changing the reference will make the previous BigCube object go out of scope, causing it to get
             garbage collected.
-
-            If I tried to change bigCube's reference within a function,
 
 
 

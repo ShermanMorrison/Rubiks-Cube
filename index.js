@@ -25,13 +25,13 @@ var rad = Math.PI/ 180;
 
 var render = function () {
 
-    cube_container.bigCube.try_rotate();
+    bigCube.try_rotate();
 
     requestAnimationFrame( render );
 
     renderer.render(scene, camera);
 
-    cube_container.bigCube.try_update();
+    bigCube.try_update();
 };
 
 
@@ -393,7 +393,7 @@ function clear_scene() {
 
 
 function rotate(xyz, layer, ccw) {
-    cube_container.bigCube.enqueue_rotation(xyz, layer, ccw);
+    bigCube.enqueue_rotation(xyz, layer, ccw);
 }
 
 function rotateX(layer){
@@ -408,23 +408,20 @@ function rotateZ(layer){
     rotate(2, layer, true);
 }
 
-//var bigCube = new BigCube(3);
-//var cube_container = {"bigCube": bigCube};
-var cube_container = {"bigCube": new BigCube(3)};
-
+var bigCube = new BigCube(3);
 
 function call_scramble() {
-    cube_container.bigCube = scramble(cube_container.bigCube);
+    bigCube = scramble(bigCube);
 }
 
 function call_reset() {
-    cube_container.bigCube = reset(cube_container.bigCube);
+    bigCube = reset(bigCube);
 }
 
 
-camera.position.z = 7 + 3*cube_container.bigCube.dim;
-camera.position.x = 7 + 3*cube_container.bigCube.dim;
-camera.position.y = 3 + 2*cube_container.bigCube.dim;
+camera.position.z = 7 + 3*bigCube.dim;
+camera.position.x = 7 + 3*bigCube.dim;
+camera.position.y = 3 + 2*bigCube.dim;
 
 render();
 

@@ -226,11 +226,6 @@ BigCube.prototype.cleanup_if_last_rotation = function(current_rotation) {
         //cleanup
         this.queue.dequeue();
 
-        if (this.queue.isEmpty()){
-            count += 1;
-            init();
-        }
-
         return true;
     }
 
@@ -285,7 +280,7 @@ BigCube.prototype.update_cube = function(xyz, index, ccw, lower_lims, upper_lims
                 if (ccw){
                     switch (xyz) {
                         case 0:
-                            this.cube[x][y][z] = cube_copy[x][z][(this.dim-1) -y];
+                            this.cube[x][y][z] = cube_copy[x][z][(this.dim-1)-y];
                             break;
                         case 1:
                             this.cube[x][y][z] = cube_copy[(this.dim-1)-z][y][x];
@@ -299,7 +294,20 @@ BigCube.prototype.update_cube = function(xyz, index, ccw, lower_lims, upper_lims
                     }
                 }
                 else{
-
+                    switch (xyz) {
+                        case 0:
+                            this.cube[x][y][z] = cube_copy[x][(this.dim-1)-z][y];
+                            break;
+                        case 1:
+                            this.cube[x][y][z] = cube_copy[z][y][(this.dim-1)-x];
+                            break;
+                        case 2:
+                            this.cube[x][y][z] = cube_copy[(this.dim-1)-y][x][z];
+                            break;
+                        default:
+                            throw "AHHH";
+                            break;
+                    }
                 }
             }
         }
@@ -369,9 +377,7 @@ function rotateZ(layer){
 
 
 var bigCube = new BigCube(2);
-//
-//bigCube.enqueue_rotation(2,2,false);
-//bigCube.enqueue_rotation(1,2,true);
+
 
 camera.position.z = 7 + 3*bigCube.dim;
 camera.position.x = 7 + 3*bigCube.dim;

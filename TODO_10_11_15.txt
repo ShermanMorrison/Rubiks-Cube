@@ -6,16 +6,29 @@ __SCRAMBLE__
 
 Desires
 
+    COMPLETE
+
     Calling BigCube.scramble() immediately starts scrambling the cube,
     even if it was in the middle of a rotation
 
-    2 modes:
+    Details
+    Cube immediately gets reset and the scramble is rendered turn-by-turn
 
-        Hide Scramble:
-        Cube immediately becomes scrambled
+        - Do each rotation in one 90 degree chunk
+        - Do not allow non-scramble rotations to be queued during scramble
+        - Re-render during scrambling
+        - Once rotation queue is empty, scrambling is complete
 
-        Show Scramble:
-        Cube immediately gets reset and the scramble is rendered turn-by-turn
+    Implementation
+        -   Make separate full-rotate function, and pop from queue for each rotation
+            There is no need to process the QueuedRotations, because they
+            are complete in one rotation.
+        -   Issue: render() loop stops running after first do_full_rotation()
+            -   Reason was that "requestAnimationFrame( render );" must be called
+                to queue the next call to render()
+            -   Decided to show each 90 degree rotation of the scramble- more satisfying
+                to see it rather than just wait half a second for the cube to scramble.
+            -
 
 Implementation
 
@@ -43,7 +56,10 @@ Implementation
             Changing the reference will make the previous BigCube object go out of scope, causing it to get
             garbage collected.
 
-
+            The thinking behind using a container object only applies if you're wanting to modify a reference.
+            If you pass in a reference variable and modify it, JavaScript is actually modifying a copy of that
+            reference, which will go out of scope when you exit the function. But if you modify the actual reference
+            in the parent scope directly, it will change.
 
 
 
@@ -57,3 +73,5 @@ Implementation
         Nothing, the things getting rendered are the actual Cube objects.
         So the reset() method has to reset BigCube.cube to contain the right cubes,
         and then actually rotate the cubes to their correct position.
+
+

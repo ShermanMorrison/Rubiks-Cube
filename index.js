@@ -25,6 +25,14 @@ var rad = Math.PI/ 180;
 
 var render = function () {
 
+    if (bigCube.is_scrambling){
+        bigCube.do_full_rotation();
+
+        requestAnimationFrame( render );
+        renderer.render(scene, camera);
+        return;
+    }
+
     bigCube.try_rotate();
 
     requestAnimationFrame( render );
@@ -122,7 +130,6 @@ function QueuedRotation (xyz, layer, ccw) {
 function BigCube(dim) {
 
     this.num_scramble_turns = 20;
-    this.is_showing_scramble = false;
     this.is_scrambling = false;
 
     this.dim = dim;
@@ -178,6 +185,19 @@ function BigCube(dim) {
 
 }
 
+BigCube.prototype.do_full_rotation = function() {
+
+    var current_rotation = this.queue.dequeue();
+
+    this.rotate_animate(current_rotation.xyz, current_rotation.layer, current_rotation.ccw, current_rotation.angle, Math.PI/2);
+
+    this.update_cube_state(current_rotation.xyz, current_rotation.layer, current_rotation.ccw);
+
+    if (this.queue.isEmpty()){
+        this.is_scrambling = false;
+    }
+}
+
 BigCube.prototype.try_rotate = function() {
     // no rotation to do
     if (this.queue.isEmpty()){
@@ -187,7 +207,7 @@ BigCube.prototype.try_rotate = function() {
     var current_rotation = this.queue.peek();
 
     // physically rotate cube
-    this.rotate_animate(current_rotation.xyz, current_rotation.layer, current_rotation.ccw, current_rotation.angle);
+    this.rotate_animate(current_rotation.xyz, current_rotation.layer, current_rotation.ccw, current_rotation.angle, this.rate);
 
 }
 
@@ -236,7 +256,7 @@ BigCube.prototype.cleanup_if_last_rotation = function(current_rotation) {
 }
 
 // Physically rotate the cube
-BigCube.prototype.rotate_animate = function(xyz, index, ccw, angle) {
+BigCube.prototype.rotate_animate = function(xyz, index, ccw, angle, input_rate) {
 
     var layer = this.layers[xyz][index];
     for (var i=0; i<layer.length; i++){
@@ -245,8 +265,9 @@ BigCube.prototype.rotate_animate = function(xyz, index, ccw, angle) {
 
         cube.translate(p.x, p.y, p.z );
 
-        var rate = this.rate;
-        if (Math.abs(angle) < this.rate){
+        var rate = input_rate;
+
+        if (Math.abs(angle) < rate){
             rate = Math.abs(angle);
         }
         var angle_to_rotate = rate * (ccw ? 1 : -1)
@@ -317,23 +338,14 @@ BigCube.prototype.update_cube = function(xyz, index, ccw, lower_lims, upper_lims
 }
 
 // Queue a rotation about xyz in ccw direction
-BigCube.prototype.enqueue_rotation = function(xyz, layer, ccw) {
+BigCube.prototype.enqueue_rotation = function(xyz, layer, ccw, is_scramble_rotation) {
+    if (this.is_scrambling && !is_scramble_rotation){
+        return;
+    }
     this.queue.enqueue(new QueuedRotation(xyz, layer, ccw));
 }
 
 BigCube.prototype.update_layers = function(xyz, index, ccw, lower_lims, upper_lims) {
-//    var dim1 = (xyz + 1) % 3;
-//    var dim2 = (xyz + 1) % 3;
-//
-//    // add and remove from the <dim> layers of dim1
-//    for (var i=0; i<this.dim; i++){
-//        for (var j=0; j<(this.dim * this.dim); j++){
-//
-//        }
-//    }
-//
-//    // add to layers
-
     this.layers = this.make_layers(this.dim);
 }
 
@@ -357,17 +369,18 @@ BigCube.prototype.copy_cube = function(){
 function scramble(myCube) {
 
     // get new reset cube
-    var bigCube = reset(myCube);
+    var newBigCube = reset(myCube);
 
+    newBigCube.is_scrambling = true;
     // scramble cube
-    for (var s=0; s<bigCube.num_scramble_turns; s++) {
+    for (var s=0; s<newBigCube.num_scramble_turns; s++) {
         var xyz = Math.floor(3 * Math.random());
-        var layer = Math.floor(bigCube.dim * Math.random());
+        var layer = Math.floor(newBigCube.dim * Math.random());
         var ccw = true; //(Math.random() > 0.5) ? true : false;
-        bigCube.enqueue_rotation(xyz, layer, ccw);
+        newBigCube.enqueue_rotation(xyz, layer, ccw, true);
     }
 
-    return bigCube;
+    return newBigCube;
 }
 
 
@@ -379,9 +392,9 @@ function reset(myCube) {
 
     // create new cube in the scene
     var dim = myCube.dim;
-    var bigCube = new BigCube(dim);
+    var newBigCube = new BigCube(dim);
 
-    return bigCube;
+    return newBigCube;
 }
 
 
@@ -393,7 +406,8 @@ function clear_scene() {
 
 
 function rotate(xyz, layer, ccw) {
-    bigCube.enqueue_rotation(xyz, layer, ccw);
+    var is_scramble_rotation = false;
+    bigCube.enqueue_rotation(xyz, layer, ccw, is_scramble_rotation);
 }
 
 function rotateX(layer){
@@ -425,16 +439,6 @@ camera.position.y = 3 + 2*bigCube.dim;
 
 render();
 
-function InnerClass() {
-    this.val = "5";
-}
-
-function Class () {
-    this.inner_class = new InnerClass();
-}
-
-var c = new Class();
-var container = {"c": c};
 
 
 

@@ -93,7 +93,8 @@ Implementation
         In try_update, we determine that cube is solved before the last render has happened.
         If we immediately alert, cube won't get to do the last render until user closes alert.
 
-        We can solve this by
+        We can solve this by using Web Workers, or by simply not calling a method that blocks the
+        UI thread like alert() does.
 
 
 

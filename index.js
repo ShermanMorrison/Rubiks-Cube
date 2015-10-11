@@ -23,17 +23,15 @@ camera.rotation.y = Math.PI/4;
 var rad = Math.PI/ 180;
 
 
-
-
 var render = function () {
 
-    bigCube.try_rotate();
+    cube_container.bigCube.try_rotate();
 
     requestAnimationFrame( render );
 
     renderer.render(scene, camera);
 
-    bigCube.try_update();
+    cube_container.bigCube.try_update();
 };
 
 
@@ -121,7 +119,11 @@ function QueuedRotation (xyz, layer, ccw) {
 ** Class for entire Rubik's Cube.
 ** Contains methods to rotate cube and make cube copies.
 */
-function BigCube (dim) {
+function BigCube(dim) {
+
+    this.num_scramble_turns = 20;
+    this.is_showing_scramble = false;
+    this.is_scrambling = false;
 
     this.dim = dim;
 
@@ -319,7 +321,6 @@ BigCube.prototype.enqueue_rotation = function(xyz, layer, ccw) {
     this.queue.enqueue(new QueuedRotation(xyz, layer, ccw));
 }
 
-
 BigCube.prototype.update_layers = function(xyz, index, ccw, lower_lims, upper_lims) {
 //    var dim1 = (xyz + 1) % 3;
 //    var dim2 = (xyz + 1) % 3;
@@ -352,6 +353,38 @@ BigCube.prototype.copy_cube = function(){
     return cube;
 }
 
+// Returns new, scrambled cube
+function scramble(myCube) {
+
+    // get new reset cube
+    var bigCube = reset(myCube);
+
+    // scramble cube
+    for (var s=0; s<bigCube.num_scramble_turns; s++) {
+        var xyz = Math.floor(3 * Math.random());
+        var layer = Math.floor(bigCube.dim * Math.random());
+        var ccw = true; //(Math.random() > 0.5) ? true : false;
+        bigCube.enqueue_rotation(xyz, layer, ccw);
+    }
+
+    return bigCube;
+}
+
+
+// Returns new, reset cube
+function reset(myCube) {
+
+    // clear previous cube from scene
+    clear_scene();
+
+    // create new cube in the scene
+    var dim = myCube.dim;
+    var bigCube = new BigCube(dim);
+
+    return bigCube;
+}
+
+
 function clear_scene() {
     while (scene.children.length > 0) {
         scene.remove(scene.children[0]);
@@ -360,7 +393,7 @@ function clear_scene() {
 
 
 function rotate(xyz, layer, ccw) {
-    bigCube.enqueue_rotation(xyz, layer, ccw);
+    cube_container.bigCube.enqueue_rotation(xyz, layer, ccw);
 }
 
 function rotateX(layer){
@@ -375,35 +408,36 @@ function rotateZ(layer){
     rotate(2, layer, true);
 }
 
+//var bigCube = new BigCube(3);
+//var cube_container = {"bigCube": bigCube};
+var cube_container = {"bigCube": new BigCube(3)};
 
-var bigCube = new BigCube(2);
 
-
-camera.position.z = 7 + 3*bigCube.dim;
-camera.position.x = 7 + 3*bigCube.dim;
-camera.position.y = 3 + 2*bigCube.dim;
-
-var count = 2;
-
-function init() {
-    if (count < 6){
-        clear_scene();
-        camera.position.z = 7 + 3*bigCube.dim;
-        camera.position.x = 7 + 3*bigCube.dim;
-        camera.position.y = 3 + 2*bigCube.dim;
-        bigCube = new BigCube(count);
-        for (var s=0; s<10; s++) {
-            var xyz = Math.floor(3 * Math.random());
-            var layer = Math.floor(bigCube.dim * Math.random());
-            var ccw = true; //(Math.random() > 0.5) ? true : false;
-            bigCube.enqueue_rotation(xyz, layer, ccw);
-        }
-    }
+function call_scramble() {
+    cube_container.bigCube = scramble(cube_container.bigCube);
 }
-//debugger;
 
+function call_reset() {
+    cube_container.bigCube = reset(cube_container.bigCube);
+}
+
+
+camera.position.z = 7 + 3*cube_container.bigCube.dim;
+camera.position.x = 7 + 3*cube_container.bigCube.dim;
+camera.position.y = 3 + 2*cube_container.bigCube.dim;
 
 render();
+
+function InnerClass() {
+    this.val = "5";
+}
+
+function Class () {
+    this.inner_class = new InnerClass();
+}
+
+var c = new Class();
+var container = {"c": c};
 
 
 

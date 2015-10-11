@@ -1,0 +1,61 @@
+Implement BigCube.scramble()
+
+Implement BigCube.get_is_solved()
+
+__SCRAMBLE__
+
+Desires
+
+    Calling BigCube.scramble() immediately starts scrambling the cube,
+    even if it was in the middle of a rotation
+
+    2 modes:
+
+        Hide Scramble:
+        Cube immediately becomes scrambled
+
+        Show Scramble:
+        Cube immediately gets reset and the scramble is rendered turn-by-turn
+
+Implementation
+
+    Ways to reset scene:
+
+    1. Clear all objects from the scene, render a new cube.
+
+        For a 10x10 cube, that takes 200 ms.
+
+        Garbage collecting issue?
+            Remove all Cubes from scene, set bigCube to new BigCube()
+            At that point the scene has the 54 new cubes.
+            But then I call RotateX(), and suddenly there are 108 cubes on the scene.
+
+            bigCube had the references to the old Cubes, but now it points to a different set of Cubes.
+
+            Problem was that I had bigCube and cube_container.bigCube both at once.
+
+            Modifying cube_container.bigCube did not change bigCube.
+
+            This is because both are just references to the object. Setting cube_container.bigCube to null
+            just sets a reference to null.
+
+            Having a cube_container allows me to change where in memory the cube_container.bigCube points.
+            Changing the reference will make the previous BigCube object go out of scope, causing it to get
+            garbage collected.
+
+            If I tried to change bigCube's reference within a function,
+
+
+
+
+
+    2. Reset the cube. <-- lots of work, at best save 200ms
+
+        Resetting the cube could go hand in hand with checking if it is solved.
+        Each cube object could contain its original position and orientation.
+        The resetting just checks that the cubes are in the right places.
+
+        What happens right now if you modify the BigCube.cube object?
+        Nothing, the things getting rendered are the actual Cube objects.
+        So the reset() method has to reset BigCube.cube to contain the right cubes,
+        and then actually rotate the cubes to their correct position.

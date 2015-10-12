@@ -97,6 +97,9 @@ Implementation
         UI thread like alert() does.
 
 
+    Web Worker Implementation
+
+
 
 
 

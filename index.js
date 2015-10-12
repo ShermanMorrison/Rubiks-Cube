@@ -388,7 +388,7 @@ BigCube.prototype.check_if_solved = function() {
     var is_solved = this.get_is_solved();
 
     if (is_solved){
-        alert("You solved the cube! Good job!");
+        setTimeout(function() {alert("You solved the cube! Good job!"); }, 50);
     }
 
 }
@@ -486,7 +486,8 @@ camera.position.y = 3 + 2*bigCube.dim;
 render();
 
 
-
+//rotate(1,2,false);
+//rotateY(2);
 
 
 

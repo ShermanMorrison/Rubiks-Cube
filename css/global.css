@@ -1,0 +1,23 @@
+body
+{
+  height: 400px;
+  position: relative;
+  width: 400px;
+}
+canvas
+{
+  height: 100%;
+  width: 100%;
+}
+.controls
+{
+  bottom: 0;
+  left: 0;
+  position: absolute;
+}
+.controls2
+{
+  bottom: 25;
+  left: 0;
+  position: absolute;
+}

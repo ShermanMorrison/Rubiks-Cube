@@ -93,11 +93,13 @@ Implementation
         In try_update, we determine that cube is solved before the last render has happened.
         If we immediately alert, cube won't get to do the last render until user closes alert.
 
-        We can solve this by using Web Workers, or by simply not calling a method that blocks the
-        UI thread like alert() does.
+        We can solve this with a timeout delay, by using Web Workers, or by using a display method
+        that gets put into the renderer queue to "wait its turn".
 
+        I decided to just use a timeout. Web workers aren't really relevant here because I'm not trying
+        to do things concurrently, I'm just trying to enforce an order to events. It would be interesting
+        to use web workers to speed up the creation of the Cube, for large cubes (N > 10).
 
-    Web Worker Implementation
 
 
 

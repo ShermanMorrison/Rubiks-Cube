@@ -8,6 +8,7 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
 
+
 //controls = new THREE.OrbitControls (camera, renderer.domElement);
 //var webglEl = document.getElementById('webgl');
 //webglEl.appendChild(renderer.domElement);
@@ -385,7 +386,11 @@ BigCube.prototype.get_is_solved = function(){
 }
 
 BigCube.prototype.check_if_solved = function() {
-    var is_solved = this.get_is_solved();
+
+    var is_solved = false;
+    if (this.check_if_solved){
+        this.get_is_solved();
+    };
 
     if (is_solved){
         setTimeout(function() {alert("You solved the cube! Good job!"); }, 50);
@@ -416,7 +421,7 @@ function scramble(myCube) {
     var newBigCube = reset(myCube);
 
     newBigCube.is_scrambling = true;
-    newBigCube.is_checking_solved;
+    newBigCube.is_checking_solved = true;
 
     // scramble cube
     for (var s=0; s<newBigCube.num_scramble_turns; s++) {
@@ -479,8 +484,8 @@ function call_reset() {
 }
 
 
-camera.position.z = 7 + 3*bigCube.dim;
-camera.position.x = 7 + 3*bigCube.dim;
+camera.position.z = 3 + 3*bigCube.dim;
+camera.position.x = 3 + 3*bigCube.dim;
 camera.position.y = 3 + 2*bigCube.dim;
 
 render();
@@ -489,8 +494,82 @@ render();
 //rotate(1,2,false);
 //rotateY(2);
 
+$("#btn_scramble").click(function(){
+    call_scramble();
+});
+
+$("#btn_reset").click(function(){
+    call_reset();
+});
+
+document.onkeypress = function(e){
+    e = e || window.event;
+    var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
+    if (charCode) {
+        var char = String.fromCharCode(charCode);
+        switch(char) {
+            // x
+            case "q":
+                rotate(0,0,true);
+                break;
+            case "w":
+                rotate(0,1,true);
+                break;
+            case "e":
+                rotate(0,2,true);
+                break;
+            case "a":
+                rotate(0,0,false);
+                break;
+            case "s":
+                rotate(0,1,false);
+                break;
+            case "d":
+                rotate(0,2,false);
+                break;
+
+            // y
+            case "r":
+                rotate(1,0,true);
+                break;
+            case "t":
+                rotate(1,1,true);
+                break;
+            case "y":
+                rotate(1,2,true);
+                break;
+            case "f":
+                rotate(1,0,false);
+                break;
+            case "g":
+                rotate(1,1,false);
+                break;
+            case "h":
+                rotate(1,2,false);
+                break;
+
+            // x
+            case "u":
+                rotate(2,0,true);
+                break;
+            case "i":
+                rotate(2,1,true);
+                break;
+            case "o":
+                rotate(2,2,true);
+                break;
+            case "j":
+                rotate(2,0,false);
+                break;
+            case "k":
+                rotate(2,1,false);
+                break;
+            case "l":
+                rotate(2,2,false);
+                break;
 
 
-
-
+        }
+    }
+};
 

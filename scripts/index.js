@@ -140,7 +140,7 @@ function BigCube(dim) {
     this.is_checking_solved = false;
     this.is_solved = false;
 
-    this.num_scramble_turns = 20;
+    this.num_scramble_turns = 1;
     this.is_scrambling = false;
 
     this.dim = dim;
@@ -436,13 +436,13 @@ function scramble(myCube) {
 
 
 // Returns new, reset cube
-function reset(myCube) {
+function reset(myCube, dim) {
 
     // clear previous cube from scene
     clear_scene();
 
     // create new cube in the scene
-    var dim = myCube.dim;
+    var dim = dim != null ? dim : myCube.dim;
     var newBigCube = new BigCube(dim);
 
     return newBigCube;
@@ -479,8 +479,8 @@ function call_scramble() {
     bigCube = scramble(bigCube);
 }
 
-function call_reset() {
-    bigCube = reset(bigCube);
+function call_reset(dim) {
+    bigCube = reset(bigCube, dim);
 }
 
 
@@ -493,14 +493,14 @@ render();
 
 //rotate(1,2,false);
 //rotateY(2);
-
-$("#btn_scramble").click(function(){
-    call_scramble();
-});
-
-$("#btn_reset").click(function(){
-    call_reset();
-});
+//
+//$("#btn_scramble").click(function(){
+//    call_scramble();
+//});
+//
+//$("#btn_reset").click(function(){
+//    call_reset();
+//});
 
 document.onkeypress = function(e){
     e = e || window.event;

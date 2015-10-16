@@ -1,0 +1,10 @@
+1. Create the UI view w Bootstrap
+    - Scramble btn
+    - Reset btn
+    - Dimension input
+
+
+Issue
+    - Check for solution needs to be re-implemented
+    Can't just check that miniCubes are in correct positions...There are 6 possible
+    configurations that mean the cube is solved.

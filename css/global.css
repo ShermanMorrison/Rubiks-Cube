@@ -9,18 +9,6 @@ canvas
   height: 100%;
   width: 100%;
 }
-.controls
-{
-  bottom: 0;
-  left: 0;
-  position: absolute;
-}
-.controls2
-{
-  bottom: 25;
-  left: 0;
-  position: absolute;
-}
 
 .btn-vert-block {
   margin-top: 10px;
@@ -29,4 +17,39 @@ canvas
 
 .view-container {
   position: absolute;
+}
+
+
+input[readonly] {
+     cursor: initial !important;
+     text-align: center;
+}
+
+.inner-addon {
+  position: relative;
+}
+
+.inner-addon .glyphicon {
+  color: green;
+  font-size:2em;
+  cursor: pointer;
+  vertical-align: bottom;
+  position: absolute;
+  padding-top: 2px;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.left-addon.glyphicon {
+  left: 0px;
+}
+
+.right-addon.glyphicon {
+  right: 0px;
+}
+
+
+.inner-addon input {
+  padding-left: 35px;
+  padding-right: 35px;
 }

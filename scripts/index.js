@@ -441,9 +441,15 @@ function reset(myCube, dim) {
     // clear previous cube from scene
     clear_scene();
 
+
+
     // create new cube in the scene
     var dim = dim != null ? dim : myCube.dim;
     var newBigCube = new BigCube(dim);
+
+    camera.position.z =  3*dim;
+    camera.position.x =  3*dim;
+    camera.position.y =  2*dim;
 
     return newBigCube;
 }
@@ -484,9 +490,9 @@ function call_reset(dim) {
 }
 
 
-camera.position.z = 3 + 3*bigCube.dim;
-camera.position.x = 3 + 3*bigCube.dim;
-camera.position.y = 3 + 2*bigCube.dim;
+camera.position.z = 3*bigCube.dim;
+camera.position.x = 3*bigCube.dim;
+camera.position.y = 2*bigCube.dim;
 
 render();
 
